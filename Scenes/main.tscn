@@ -1,0 +1,67 @@
+[gd_scene load_steps=10 format=3 uid="uid://d05iocvr7t2b4"]
+
+[ext_resource type="Shader" uid="uid://dm2ymtyn0wpn7" path="res://Shaders/custom_particle.gdshader" id="1_6bp64"]
+[ext_resource type="Script" uid="uid://degjx45vurhk7" path="res://Scripts/ParticleController.cs" id="1_bo1nx"]
+[ext_resource type="Script" uid="uid://baskpaqlvsw78" path="res://Scripts/PhysicsChain.cs" id="2_8gbba"]
+[ext_resource type="PackedScene" uid="uid://dk8137vulhmxd" path="res://Scenes/ChainSegment.tscn" id="3_jjvhh"]
+[ext_resource type="Script" uid="uid://b0704nnt6xj63" path="res://Scripts/LaserDetector.cs" id="4_kry3j"]
+[ext_resource type="Script" uid="uid://uc1seta4fbb4" path="res://Scripts/Player.cs" id="5_kry3j"]
+[ext_resource type="Texture2D" uid="uid://d0qvlmfr72d3n" path="res://Images/4Character.png" id="6_21xkr"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_344ge"]
+shader = ExtResource("1_6bp64")
+shader_parameter/wave_intensity = 0.1
+shader_parameter/color_start = Color(1, 0.5, 0, 1)
+shader_parameter/color_end = Color(1, 0, 0.5, 1)
+shader_parameter/time_scale = 1.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_21xkr"]
+radius = 33.0
+
+[node name="Main" type="Node2D"]
+
+[node name="ParticleSystem" type="GPUParticles2D" parent="."]
+position = Vector2(560, 300)
+scale = Vector2(6, 3.5)
+amount = 10
+lifetime = 0.1
+explosiveness = 0.05
+process_material = SubResource("ShaderMaterial_344ge")
+script = ExtResource("1_bo1nx")
+
+[node name="PhysicsDemo" type="Node2D" parent="."]
+position = Vector2(100, 100)
+script = ExtResource("2_8gbba")
+SegmentScene = ExtResource("3_jjvhh")
+
+[node name="LaserSystem" type="Node2D" parent="."]
+z_index = 20
+position = Vector2(500, 200)
+script = ExtResource("4_kry3j")
+PlayerPath = NodePath("../Player")
+ParticleSystemPath = NodePath("../ParticleSystem")
+RedTintPath = NodePath("../HUD/ColorRect")
+
+[node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(100, 500)
+motion_mode = 1
+script = ExtResource("5_kry3j")
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("6_21xkr")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+position = Vector2(-3, 35)
+shape = SubResource("CircleShape2D_21xkr")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="HUD"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0, 0, 0.3)
